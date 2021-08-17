@@ -1,5 +1,8 @@
 package br.com.alura.controller;
 
+import br.com.alura.loja.dao.ProdutoDao;
+import br.com.alura.loja.util.JPAUtil;
+import br.com.alura.modelo.Categoria;
 import br.com.alura.modelo.Produto;
 
 import javax.persistence.EntityManager;
@@ -10,19 +13,15 @@ import java.math.BigDecimal;
 public class CadastroDeProduto {
     public static void main(String[] args) {
 
-        Produto celular = new Produto();
-        celular.setNome("Xiaomi Redmi");
-        celular.setDescricao("Décima geração");
-        celular.setPreco(new BigDecimal("800"));
+        Produto celular =
+                new Produto("Xiaomi Redmi", "Décima geração",
+                        new BigDecimal("800"), Categoria.CELULARES);
 
-        //EntityManager é uma interface, logo nãopodemos dar new EntityManager().
-        //Poderíamos instanciar uma classe que impplementa o interface
-        EntityManagerFactory factory = Persistence
-                .createEntityManagerFactory("loja");
-        EntityManager em  = factory.createEntityManager();
+        EntityManager em = JPAUtil.getEntityManager();
+        ProdutoDao produtoDao = new ProdutoDao(em);
 
         em.getTransaction().begin(); //Devido o Transaction ser local Resource Local, temos que inicar a transaction
-        em.persist(celular);
+        produtoDao.cadastrar(celular);
         em.getTransaction().commit();
         em.close();
 
