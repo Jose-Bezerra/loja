@@ -16,7 +16,7 @@ public class Produto {
    private String descricao;
    private BigDecimal preco;
    private LocalDate dataCadastro = LocalDate.now();
-   @Enumerated(EnumType.STRING)
+   @ManyToOne //Cardinalidade:  Muitos produtos para uma categoria
    private Categoria categoria;
 
     public Produto(String nome, String descricao, BigDecimal preco, Categoria categoria) {
