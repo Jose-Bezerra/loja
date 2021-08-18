@@ -8,32 +8,42 @@ import br.com.alura.modelo.Produto;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.List;
 
 public class CadastroDeProduto {
     public static void main(String[] args) {
 
-        Categoria celulares = new Categoria("CELULARES") ;
+        cadastrarProduto();
+        EntityManager em = JPAUtil.getEntityManager();
+        ProdutoDao produto = new ProdutoDao(em);
 
+        Produto p = produto.buscarPorId(1l);
+        System.out.println(p.getPreco());
+
+        List<Produto> todos = produto.buscarPorNomeDaCategoria("CELULARES");
+        todos.forEach(p2 -> System.out.println(p.getNome()));
+
+        BigDecimal precoDoProduto = produto.buscarPrecoDoProdutoComNome("Xiaomi Redmi");
+        System.out.println("Preço do produto: " + precoDoProduto);
+
+
+    }
+
+    private static void cadastrarProduto() {
+        Categoria celulares = new Categoria("CELULARES") ;
+        Produto celular =
+                new Produto("Xiaomi Redmi", "Décima geração",
+                        new BigDecimal("800"), celulares);
 
         EntityManager em = JPAUtil.getEntityManager();
-
+        ProdutoDao produtoDao = new ProdutoDao(em);
+        CategoriaDao categoriaDao = new CategoriaDao(em);
 
         em.getTransaction().begin(); //Devido o Transaction ser local Resource Local, temos que inicar a transaction
-
-        em.persist(celulares); // Sai do estado Transient para o Managed
-        celulares.setNome("XPTO");
-
-        em.flush(); //atualiza banco de dados sem finalizar a transação. O Commit
-        //finalizaria a transação
-        em.clear(); //limpa entidades gerenciadas
-
-        celulares = em.merge(celulares);
-        celulares.setNome("1234");
-        em.flush();
-        em.clear();
-        em.remove(celulares);
-        em.flush();
-
+        categoriaDao.cadastrar(celulares);
+        produtoDao.cadastrar(celular);
+        em.getTransaction().commit();
+        em.close();
     }
 
 
